@@ -1,0 +1,116 @@
+<html>
+<head>
+    <title>
+        MiSeq QC Report for \Sexpr{strftime(Sys.Date(), format="%B %d, %Y")}
+    </title>
+    <script type="text/javascript">
+        /* Get the next element sibling. */
+        function nextElement(n) {
+            x = n.nextSibling;
+            while (x.nodeType != 1) {
+                x = x.nextSibling;
+            }
+            return x;
+        }
+
+        /* Display and hide images by clicking table rows. */
+        function toggleImage(row){
+            ncol = row.querySelectorAll("td").length;
+            graph_cell = nextElement(row).querySelector("td");
+            graph_cell.setAttribute("colspan", ncol);
+            if (graph_cell.style.display == "none") {
+                graph_cell.style.display = "table-cell";
+            } else {
+                graph_cell.style.display = "none";
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>MiSeq QC Report for \Sexpr{strftime(Sys.Date(),, format="%B %d, %Y")}</h1>
+
+    <dl>
+        <dt>Run ID</dt>
+        <dd>\Sexpr{data[nrow(data), "RUNID"]}</dd>
+        <dt>Run Date</dt>
+        <dd>\Sexpr{strftime(data[nrow(data), "RUNSTARTDATE"], "%B %d, %Y")}</dd>
+        <dt>Cutoff Date</dt>
+        <dd>\Sexpr{strftime(min(data$RUNSTARTDATE), "%B %d, %Y")}</dd>
+<<echo=F, results=html>>=
+    html <- c(apply(reagent.list, 1, function (row) {
+        daysleft <- data[nrow(data), paste0(row["reagent"], ".DAYSLEFT")]
+        desc <- paste0("<dt>Days until ", row["description"], " expiration</dt>")
+        item <- paste0("<dd>", daysleft, "</dd>")
+        c(desc, item)
+    }))
+    paste0(html, collapse="\n")
+@
+    </dl>
+
+    <h2>Alerts</h2>
+<<echo=F, results=html>>=
+    if (length(alerts) > 0) {
+        paste0(make.html.list(alerts), collapse="\n")
+    } else {
+        "<p>Nothing to report.</p>"
+    }
+@
+    <h2>Reports</h2>
+
+    <img src="REPORT-1.png" usemap="#REPORT1Map" />
+    <br />
+    <img src="REPORT-2.png" usemap="#REPORT2Map" />
+    <br />
+
+    <h2>Parameters</h2>
+    <p>Values more than 4 standard deviations away from the mean are shown at 4 standard deviations.</p>
+<<echo=F, results=html>>=
+    html <- sapply(0:(nplots-1), function (i) {
+        paste0('<img src="parameters', i, '.png" /><br />')
+    })
+    paste0(html, collapse="\n")
+@
+    <table>
+        <thead>
+            <tr>
+               <th>Parameter</th>
+               <th>Description</th>
+               <th>Mean</th>
+               <th>Median</th>
+               <th>Standard Deviation</th>
+            </tr>
+        </thead>
+        <tbody>
+<<echo=F, results=html>>=
+    tbody <- c(sapply(param.list$parameter, function (p) {
+        cells <- c(paste0('<td class="text_cell">', p, "</td>"))
+        cells <- c(cells, paste0('<td class="text_cell">', param.list[p, "param.desc"], "</td>"))
+        cells <- c(cells, paste0('<td class="number_cell">', table.format(mean(data[,p])), "</td>"))
+        cells <- c(cells, paste0('<td class="number_cell">', table.format(median(data[,p])), "</td>"))
+        cells <- c(cells, paste0('<td class="number_cell">', table.format(sd(data[,p])), "</td>"))
+        c('<tr>', cells, "</tr>")
+    }))
+    paste0(tbody, collaspe="\n")
+@
+        </tbody>
+    </table>
+    <br/>
+
+    <small>
+    <p>Using the following Westgard rules: 1<sub>3s</sub> (one measurement
+    &gt;3&sigma; away from the mean), 2<sub>2s</sub> (two consecutive
+    measurements &gt;2&sigma; in the same direction), 4<sub>1s</sub> (four
+    consecutive measurements &gt;1&sigma; in the same direction),
+    R4s (change from &gt;2&sigma; to &lt;2&sigma; or vice versa), 10x
+    (ten or more consecutive measurements on one side of the mean).</p>
+    
+    <p>Using tolerances of \Sexpr{clusterdensity.min} and
+    \Sexpr{clusterdensity.max} to flag cluster density.</p>
+    </small>
+
+<<echo=F, results=html>>=
+    paste0(image.maps, collapse="\n")
+@
+</body>
+</html>

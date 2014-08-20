@@ -1,0 +1,59 @@
+html, body {
+    width: 800;
+    margin: auto;
+}
+
+h1, h2 {
+    font-family: sans-serif;
+}
+
+img {
+    margin: auto;
+    padding: 0px;
+}
+
+table, th, td {
+    border: 1px solid grey;
+}
+
+th, td {
+    padding: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.image_cell {
+    margin: auto;
+    text-align: center;
+}
+
+.number_cell {
+    text-align: right;
+}
+
+area {
+    cursor: pointer;
+    display: block;
+}
+
+dt {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+dt:not(.noclear) {
+    float: left;
+    clear: left;
+    margin-right: 5px;
+}
+
+dt:after {
+    content: ":";
+}
+
+dd {
+    padding: 0 0 0.5em 0;
+}

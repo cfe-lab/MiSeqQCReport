@@ -1,0 +1,1 @@
+This folder holds working files that are used to prepare a report. 

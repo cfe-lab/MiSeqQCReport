@@ -1,0 +1,29 @@
+parameter,param.desc,param.unit
+ALIGNED_F,"reads aligned, forward",%
+ALIGNED_R,"reads aligned, reverse",%
+Q30_1,"bases passing Q30, read 1",%
+Q30_2,"bases passing Q30, read 2",%
+CLUSTERDENSITY,cluster density,1000/mm^2
+PERCENTCLUSTERSPF,clusters passing filters,%
+PHASING_F,"phasing, forward",%
+PHASING_R,"phasing, reverse",%
+PREPHASING_F,"prephasing, forward",%
+PREPHASING_R,"prephasing, reverse",%
+ERRORRATE_F,"error rate, forward",%
+ERRORRATE_R,"error rate, reverse",%
+INT_1_1_A,"A intensity, read 1, cycle 1",NA
+INT_1_1_C,"C intensity, read 1, cycle 1",NA
+INT_1_1_G,"G intensity, read 1, cycle 1",NA
+INT_1_1_T,"T intensity, read 1, cycle 1",NA
+INT_1_20_A,"A intensity, read 1, cycle 20",NA
+INT_1_20_C,"C intensity, read 1, cycle 20",NA
+INT_1_20_G,"G intensity, read 1, cycle 20",NA
+INT_1_20_T,"T intensity, read 1, cycle 20",NA
+INT_2_1_A,"A intensity, read 2, cycle 1",NA
+INT_2_1_C,"C intensity, read 2, cycle 1",NA
+INT_2_1_G,"G intensity, read 2, cycle 1",NA
+INT_2_1_T,"T intensity, read 2, cycle 1",NA
+INT_2_20_A,"A intensity, read 2, cycle 20",NA
+INT_2_20_C,"C intensity, read 2, cycle 20",NA
+INT_2_20_G,"G intensity, read 2, cycle 20",NA
+INT_2_20_T,"T intensity, read 2, cycle 20",NA
