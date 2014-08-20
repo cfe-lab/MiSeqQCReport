@@ -43,7 +43,7 @@ if (-e "last_run.txt") {
     @lastRunReported = parse_date(<$timestamp>, $settings->{'date_format'});
     close($timestamp);
 }
-if (@lastRunReported && @lastRunReported == @lastRunInDB) {
+if (@lastRunReported && @lastRunReported ~~ @lastRunInDB) {
     print "Reports up to date. Not creating a new report.\n";
     exit 0;
 }
