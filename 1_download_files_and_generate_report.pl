@@ -56,7 +56,8 @@ open(my $output, ">$dir/$fileName");
 # Dump data to a CSV file.
 $query = "SELECT L.RUNNAME, R.*, I.* FROM $settings->{'schema'}.Lab_MiSeq_Run L " .
          "LEFT JOIN $settings->{'schema'}.MiSeqQC_RunParameters R " .
-         "ON TO_DATE(L.RUNNAME, 'DD-MON-YYYY') = R.RUNSTARTDATE " .
+         "ON TO_DATE(L.RUNNAME, 'DD-MON-YYYY') = " .
+         "   TO_DATE(REGEXP_SUBSTR(EXPERIMENTNAME, '\\d{1,2}-\\w{3,4}-\\d{2,4}')) " .
          "LEFT JOIN $settings->{'schema'}.MiSeqQC_InterOpSummary I " .
          "ON R.RUNID = I.RUNID " .
          "WHERE R.RUNSTARTDATE IS NULL OR R.RUNSTARTDATE >= TO_DATE('$settings->{'start_date'}', 'DD-MON-YY')";
