@@ -36,7 +36,7 @@ IDE or operating system.
 
 7. In the marketplace, just type EPIC and search. In the install wizard, use
    the [EPIC update site][epic].
-   [epic]: http://e-p-i-c.sf.net/updates/
+[epic]: http://e-p-i-c.sf.net/updates/
 
 7. From the Window menu, choose Preferences, and navigate down to Perl EPIC:
    Editor.
@@ -72,7 +72,7 @@ IDE or operating system.
         sudo vi /etc/profile.d/oracle.sh # Add the following line:
         export ORACLE_HOME=/usr/lib/oracle/12.1/client64
 
-    [oracle]: https://help.ubuntu.com/community/Oracle%20Instant%20Client
+[oracle]: https://help.ubuntu.com/community/Oracle%20Instant%20Client
 
 13. Install Perl's Database Interface package (DBI), File::Rsync, and XML::Simple.
 
@@ -119,7 +119,7 @@ IDE or operating system.
         install.packages("Cairo")
         q()
 
-    [statet]: http://www.walware.de/it/statet/installation.mframe
+[statet]: http://www.walware.de/it/statet/installation.mframe
 
 16. Launch Eclipse. For some reason, you can't currently install StatET from the
     Eclipse Marketplace, so from the Help menu, choose Install New Software....
