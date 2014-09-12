@@ -53,18 +53,6 @@ sub uploadRunParameters($$$) {
 	$sth = $db->prepare($query);
 	$sth->execute();
 
-	if ( $sth->err ) {
-		print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-		$db->rollback();
-		
-		# TODO: Put this back, or do it from the calling script.
-#		print "ATTEMPTING TO RUN CLEAR_RUN($RunID) ...";
-#		require '/Users/emartin/Desktop/MiSeq/QC_InterOp_Upload/scriptDependencies/clear_run.pl';
-#		clear_run($RunID);
-        $db->disconnect();	
-		die;
-	}
-
 	$db->commit();
 
 	my @t = localtime(time);

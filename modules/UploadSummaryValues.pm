@@ -39,9 +39,6 @@ sub uploadSummaryValues($$) {
     $sth->execute();
     if ($sth->fetchrow_array()) {
     	$sth->finish();
-    	$db->rollback();
-        # TODO: return to calling script and skip this run.
-    	$db->disconnect();
     	die "RunID $RunID already has interopsummary data";
    	}
 
@@ -50,28 +47,15 @@ sub uploadSummaryValues($$) {
     $query = "SELECT read1, index1, index2, read2 FROM MiSeqQC_RunParameters WHERE runID LIKE '$RunID'";
     $sth = $db->prepare($query); $sth->execute();
     my ($read1, $index1, $index2, $read2);
-    if (my @row = $sth->fetchrow_array()) { ($read1, $index1, $index2, $read2) = @row }
+    if (my @row = $sth->fetchrow_array()) {
+        ($read1, $index1, $index2, $read2) = @row;
+        $sth->finish();
+    }
     else {
     	$sth->finish();
 
-    	print 	"\nERROR: RunID doesn't appear to exist!\n" .
-    			"Displaying RunIDs in runparameters for which there is no corresponding row in interopsummary...\n\n";
-
-#    	# Show what RunIDs have NOT had interopsummary data generated
-#    	my $query2 = 	"SELECT emartin.runparameters.RunID FROM specimen.MiSeqQC_runparameters LEFT JOIN emartin.interopsummary " .
-#    					"ON emartin.runparameters.RunID LIKE emartin.interopsummary.RunID " .
-#    					"WHERE emartin.interopsummary.RunID IS NULL";
-
-#    	my $sth2 = $db->prepare($query2); $sth2->execute();
-#    	while (my @row = $sth2->fetchrow_array()) { my $missingRunID = $row[0]; print "$missingRunID\n"; }
-#    	$sth2->finish();
-
-        # TODO: return to calling script and skip this run.
-    	$db->rollback();
-    	$db->disconnect();
-    	die "\nROLLING BACK TRANSACTION!\n";
+    	die	"Run id $RunID doesn't appear to exist.";
    	}
-    $sth->finish();
 
     my ($bound1, $bound2, $bound3, $bound4) = getReadBounds($read1,$index1,$index2,$read2);
     $read1 = "cycle > 0 AND cycle <= $bound1";
@@ -272,29 +256,15 @@ sub uploadSummaryValues($$) {
     			"'$proportion_Q_30_1', '$proportion_Q_30_2', '$clusterDensity', '$cluster_percentPF', " .
     			"'$phase_1', '$phase_2', '$prephase_1', '$prephase_2', '$error_1_35', '$error_2_35')";
 
-    $sth = $db->prepare($query); $sth->execute();
-    if ( $sth->err ) {
-    	print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg:\n\n" . $sth->errstr . "\n\n";
-    	$db->rollback();
-
-        # TODO: return to calling script and skip this run.
-    	$db->disconnect();
-    	die '';
-    }
+    $sth = $db->prepare($query);
+    $sth->execute();
     $sth->finish();
     $db->commit();    
 
     #We don't need this data any more, so let's get rid of it.
     $query = "delete from MiSeqQC_QualityMetrics where cycle not in (50, 260,500)";
-    $sth = $db->prepare($query); $sth->execute();
-    if ( $sth->err ) {
-        print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg:\n\n" . $sth->errstr . "\n\n";
-        $db->rollback();
-
-        # TODO: return to calling script and skip this run.
-        $db->disconnect();
-        die '';
-    }
+    $sth = $db->prepare($query);
+    $sth->execute();
     $sth->finish();
     $db->commit();
 }

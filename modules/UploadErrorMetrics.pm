@@ -41,14 +41,6 @@ sub uploadErrorMetrics($$$) {
 						" '$errorRate', '$perfectReads', '$err1', '$err2', '$err3', '$err4')";
 
 		my $sth = $db->prepare($query); $sth->execute();
-		if ( $sth->err ) {
-			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-			$db->rollback();
-			
-			#TODO: Move this to the calling script and skip the run.
-			$db->disconnect();
-			die;
-		}
 
 		if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - ErrorMetrics, record $count\n"; }
 		$count++;

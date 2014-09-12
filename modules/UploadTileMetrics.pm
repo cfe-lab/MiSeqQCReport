@@ -53,17 +53,9 @@ sub uploadTileMetrics($$$) {
 
 		my $sth = $db->prepare($query); $sth->execute();
 		if ($count % 100 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - TileMetrics, Record $count\n"; }
-		if ( $sth->err ) {
-			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-			$db->rollback();
-
-            # TODO: return to calling script and skip this run.
-			$db->disconnect();
-			die '';
-			}
 		$c += 4;
 		$count++;
-		}
+	}
 
 	$db->commit();
 	print "Committed transaction for TileMetrics!\n\n";

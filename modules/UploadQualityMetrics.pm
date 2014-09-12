@@ -38,15 +38,6 @@ sub uploadQualityMetrics($$$) {
         "('$RunID', '$lane', '$tile', '$cycle', '$qBin', '$numClusters')";
 
                 my $sth = $db->prepare($query); $sth->execute();
-      if ( $sth->err ) {
-        print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-        $db->rollback();
-
-        # TODO: return to calling script and skip this run.
-        $db->disconnect();
-        die '';
-      }
-    
 
 			$j++;
 			if ($count % 25000 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - QualityMetrics, record $count\n"; }

@@ -25,7 +25,7 @@ my ( $needs_processing, $qc_complete, $qc_failure ) =
   ( 'needsprocessing', 'qc_uploaded', 'qc_failed_to_upload' );
 
 # Write message to failure file, and complain to stdout.
-sub FailRun($$) {
+sub failRun($$) {
     my ($error_message, $error_file_name) = @_;
     open( my $error_file, '>', $error_file_name )
       or die "Could not open error file '$error_file_name'.";
@@ -41,90 +41,59 @@ sub FailRun($$) {
 
 # Run several commands, and return 1 if they all succeed. If one fails,
 # mark the run as failed and return 0.
-sub RunCommands($@) {
+sub runCommands($@) {
     my ($qc_failure_file, @commands) = @_;
     foreach my $command (@commands) {
         if (system($command) != 0) {
-            FailRun("Couldn't run '$command'.", $qc_failure_file);
-            return 0;
+            die "Couldn't run '$command'.";
         }
     }
-    return 1;
 }
 
-sub VerifyInputFiles($$@) {
+sub verifyInputFiles($$@) {
     my ($qc_failure_file, $working_folder, @paths) = @_;
     foreach my $subpath (@paths) {
         if ( ! (-e "$working_folder/$subpath")) {
-            FailRun(
-                "Input file '$working_folder/$subpath' not found.",
-                $qc_failure_file);
-            return 0;
+            die "Input file '$working_folder/$subpath' not found.";
         }
     }
-    return 1;
 }
 
-my $success_count = 0;
-my $failure_count = 0;
-$ENV{ORACLE_HOME} = $settings->{'env_oracle_home'};
-my $dbh=DBI->connect(
-    "dbi:Oracle:host=$settings->{'host'};sid=$settings->{'sid'};port=$settings->{'port'}", 
-    $settings->{'user'},
-    $settings->{'password'},
-    {PrintError => 0, PrintWarn => 1, AutoCommit => 0});
+# Process all the data files for a run, die if anything goes wrong.
+sub processRun($$$) {
+    my ($path, $write_folder, $dbh) = @_;
 
-my @glob = <$miseq_data/*>;
-foreach my $path (@glob) {
-    if ( !( -d $path ) ) { next; }                  # For folders in macdatafile
-    if ( !( -e "$path/$needs_processing" ) ) {
-        next;
-    }    # Which are marked for processing
-    if ( ( -e "$path/$qc_complete" ) || ( -e "$path/$qc_failure" ) ) {
-        next;
-    }    # And has not already had QC uploaded
-    
-    # Assume failure.
-    $failure_count += 1;
-    
-    if (!(-d "$path/InterOp")) {
-        FailRun("$path/InterOp not found.", "$path/$qc_failure" );
-        next;
+    if ( !( -d "$path/InterOp" ) ) {
+        die "$path/InterOp not found."
     }
 
     my $new_folder = "$write_folder/" . basename($path);
     make_path($new_folder);
-    remove_tree($new_folder, {keep_root => 1});
+    remove_tree( $new_folder, { keep_root => 1 } );
 
     # Copy the necessary files
-    if ( ! RunCommands(
+    runCommands(
         "$path/$qc_failure",
         "cp -r $path/InterOp $new_folder/",
         "cp $path/SampleSheet.csv $new_folder/",
         "cp $path/runParameters.xml $new_folder/",
-        "cp $path/RunInfo.xml $new_folder/")) {
-        
-        next;
-    }
+        "cp $path/RunInfo.xml $new_folder/");
 
-    if ( ! VerifyInputFiles(
+    verifyInputFiles(
         "$path/$qc_failure",
         $new_folder,
         "InterOp/CorrectedIntMetricsOut.bin",
         "InterOp/ErrorMetricsOut.bin",
         "InterOp/ExtractionMetricsOut.bin",
         "InterOp/QMetricsOut.bin",
-        "InterOp/TileMetricsOut.bin")) {
-        
-        next;
-    }
-    
+        "InterOp/TileMetricsOut.bin");
+
     # Get Conan's SampleSheet creator date, upload the QC data, link them to that date
     my $samplesheet_date = getSampleSheetDate($new_folder);
-    my ($RunID) = uploadRunParameters(
+    my $RunID = uploadRunParameters(
         "$new_folder/runParameters.xml",
         $samplesheet_date,
-        $dbh);
+        $dbh );
     uploadCorrectedIntensityMetrics(
         $RunID,
         "$new_folder/InterOp/CorrectedIntMetricsOut.bin",
@@ -137,24 +106,51 @@ foreach my $path (@glob) {
         $RunID,
         "$new_folder/InterOp/ExtractionMetricsOut.bin",
         $dbh);
-    uploadQualityMetrics(
-        $RunID,
-        "$new_folder/InterOp/QMetricsOut.bin",
-        $dbh);
-    uploadTileMetrics(
-        $RunID,
-        "$new_folder/InterOp/TileMetricsOut.bin",
-        $dbh);
+    uploadQualityMetrics($RunID, "$new_folder/InterOp/QMetricsOut.bin", $dbh);
+    uploadTileMetrics($RunID, "$new_folder/InterOp/TileMetricsOut.bin", $dbh);
     uploadSummaryValues($RunID, $dbh);
-    
-    # If the upload was successful, write a qc_complete file flag on macdatafile
-    open( QC_PASSED, ">$path/$qc_complete" );
-    close(QC_PASSED);
-    
-    # Not a failure after all!
-    $failure_count -= 1;
-    $success_count += 1;
 }
 
-$dbh->disconnect;
+my $success_count = 0;
+my $failure_count = 0;
+$ENV{ORACLE_HOME} = $settings->{'env_oracle_home'};
+my $dbh=DBI->connect(
+    "dbi:Oracle:host=$settings->{'host'};sid=$settings->{'sid'};port=$settings->{'port'}", 
+    $settings->{'user'},
+    $settings->{'password'},
+    {RaiseError => 1, PrintError => 0, PrintWarn => 1, AutoCommit => 0});
+
+my @glob = <$miseq_data/*>;
+foreach my $path (@glob) {
+    if ( !( -d $path ) ) { next; }                  # For folders in macdatafile
+    if ( !( -e "$path/$needs_processing" ) ) {
+        next;
+    }    # Which are marked for processing
+    if ( ( -e "$path/$qc_complete" ) || ( -e "$path/$qc_failure" ) ) {
+        next;
+    }    # And has not already had QC uploaded
+    
+    eval {
+        processRun($path, $write_folder, $dbh);
+        
+        # If the upload was successful, write a qc_complete file flag on macdatafile
+        open( QC_PASSED, ">$path/$qc_complete" );
+        close(QC_PASSED);
+        $success_count += 1;
+    };
+    if ($@) {
+        my $error_message = $@;
+        print "Run $path failed: $error_message";
+        $failure_count += 1;
+        
+        $dbh->rollback();
+        my $error_file_name = "$path/$qc_failure";
+        open( my $error_file, '>', $error_file_name )
+          or die "Could not open error file '$error_file_name'.";
+        print $error_file "$error_message\n";
+        close $error_file;
+    }
+}
+
+$dbh->disconnect();
 print "Finished with $success_count successes and $failure_count failures.";
