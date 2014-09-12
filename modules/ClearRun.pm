@@ -1,34 +1,46 @@
 # Completely deletes this run from the Oracle database
 
-sub clear_run {
-    if (scalar(@_) != 1) { die "Correct syntax: clear_run(RunID)"; }
-    my ($runID) = @_;
+use strict;
 
-	use DBI;
-	require "/home/emartin/QC_InterOp_Upload/scriptDependencies/setup_oracle_authentication.pl";
-	my ($env_oracle_home, $host, $port, $sid, $user, $password) = activateOracle();
-	$ENV{ORACLE_HOME} = $env_oracle_home;
-	my $db=DBI->connect("dbi:Oracle:host=$host;sid=$sid;port=$port", $user, $password, {PrintError => 0, PrintWarn => 1, AutoCommit => 0});
-
-	my @tables = (	"correctedintensities", "errormetrics", "extractionmetrics", "tilemetrics",
-					"qualitymetrics", "extractionmetrics", "interopsummary", "runparameters");
+sub clearRun($$) {
+    my ($runID, $db) = @_;
+    
+    my $query_for_complete_run = q{
+        SELECT  COUNT(1)
+        FROM    MiSeqQC_InteropSummary
+        WHERE   runid = ?
+    };
+    my $sth = $db->prepare($query_for_complete_run);
+    $sth->execute($runID);
+    my $match_count = $sth->fetchrow_array();
+    $sth->finish();
+    if ($match_count > 0) {
+        die "Run id $runID is already in the database and complete."
+    }
+    
+	my @tables = (
+        "CORRECTEDINTENSITIES",
+        "ERRORMETRICS",
+        "EXTRACTIONMETRICS",
+        "TILEMETRICS",
+		"QUALITYMETRICS",
+		"EXTRACTIONMETRICS",
+		"RUNPARAMETERS");
 
 	foreach my $table (@tables) {
-		my $query = "DELETE FROM SPECIMEN.miseqqc_$table WHERE runID='$runID'";
-		print "$query\n";
+	    my $quoted_tablename = $db->quote_identifier("MISEQQC_$table");
+		my $query = "DELETE FROM $quoted_tablename WHERE runID = ?";
 
 		my $sth = $db->prepare($query);
-		$sth->execute();
-		if ( $sth->err ) {
-			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-			$db->rollback();
-			$db->disconnect();
-			die '';
-			}
+		$sth->execute($runID);
+		$match_count += $sth->rows;
 		$sth->finish;
-		}
-	$db->commit();
-	print "Committed transaction for clearing run $runID!\n\n";
-	$db->disconnect();
 	}
+	$db->commit();
+	
+	if ($match_count > 0) {
+    	print "Cleared $match_count existing records from run $runID.\n";
+	}
+}
+
 1;

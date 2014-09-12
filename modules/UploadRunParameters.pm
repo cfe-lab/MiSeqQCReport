@@ -1,6 +1,8 @@
 use strict;
 use XML::Simple;
 
+use ClearRun;
+
 sub uploadRunParameters($$$) {
 	my ($filePath, $samplesheet_date, $db) = @_;
 
@@ -10,6 +12,8 @@ sub uploadRunParameters($$$) {
 	my %tags = %{$data};
 
 	my ($RunID, $Username, $ExperimentName, $RunStartDate) = ($tags{'RunID'}, $tags{'Username'}, $tags{'ExperimentName'}, $tags{'RunStartDate'});
+	
+	clearRun($RunID, $db);
 
 	my (%flowCellTags) =  (%{$tags{'FlowcellRFIDTag'}});
 	my ($flowCellSerial, $flowCellPart, $flowCellExpiration) = ($flowCellTags{'SerialNumber'}, $flowCellTags{'PartNumber'}, $flowCellTags{'ExpirationDate'});
@@ -38,7 +42,7 @@ sub uploadRunParameters($$$) {
 	my $sth = $db->prepare($query);
 	$sth->execute();
 
-	if ($sth->fetchrow_array()) { die "uploadRunParameters.pl: RunID $RunID has already been uploaded into the database"; }
+	if ($sth->fetchrow_array()) { die "RunID exists in the database: $RunID"; }
     $sth->finish();
 
 	$query = 	"INSERT INTO MiSeqQC_RunParameters " .

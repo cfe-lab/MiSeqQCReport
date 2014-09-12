@@ -241,6 +241,8 @@ sub uploadSummaryValues($$) {
     print "\nUploading summary data...\n";
 
     # Upload summary values to the database
+    # We check if this record exists to see if the upload was completed, so
+    # Don't add any other steps after you commit this transaction.
     $query = 	"INSERT INTO MiSeqQC_InterOpSummary " .
     			"(runID, aligned_F, aligned_R, " .
     			"int_1_1_A,  int_1_1_C,  int_1_1_G,  int_1_1_T, " .
@@ -259,7 +261,6 @@ sub uploadSummaryValues($$) {
     $sth = $db->prepare($query);
     $sth->execute();
     $sth->finish();
-    $db->commit();    
 
     #We don't need this data any more, so let's get rid of it.
     $query = "delete from MiSeqQC_QualityMetrics where cycle not in (50, 260,500)";
