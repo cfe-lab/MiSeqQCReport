@@ -1,13 +1,53 @@
-Setting up a developer workstation
-==================================
+This document is intended to help a new team member at the [BC Centre for 
+Excellence in HIV/AIDS][cfe] get started on the project, so it describes how to
+install tools, get source code, and connect to servers. If you are trying to
+run the software at another lab, you will probably need to set up your own
+servers and adjust the instructions as needed.
 
+[cfe]: http://cfenet.ubc.ca/
+
+## Accessing the Database ##
+To run the scripts, you will need two types of access to Oracle: a test account
+with full access to a test database, and a user account with read-only access
+to the MiSeqQC_* tables.
+
+You can start the process of requesting the accounts, and then move on to
+installing software. You will need the Oracle client software to test your
+accounts, and you will need an account to test the Oracle client software.
+
+1. Ask the database administrator to create two accounts for you: one with
+   read access to the MiSeqQC_* tables, and the other with only access to its
+   own schema. This will need to be approved by
+   the lab director. You will be told the default password. Also ask for
+   the IP address, port, and SID for the Oracle database.
+
+2. The account will be created with a default password. Log in for the
+   first time, and change the password.
+
+        sqlplus USER@\"//192.168.?.?:1521/SID\"
+
+   You will be prompted to enter a new password. Oracle passwords at the
+   CfE must conform to the following guidelines:
+       * Password can not be same as username
+       * Password must be different than previous 3 passwords
+       * Password must be at least 8 characters long
+       * Password must begin with letter (all letters in uppercase)
+       * Password must contain at least two digits
+       * Password must contain at least one punctuation !"#$%&()*+,-/:;<=>?_
+       
+   If you have chosen a password which fulfills all these criteria, but
+   get errors about an invalid login, contact the database administrator
+   and ask to set your password on her computer.
+
+## Setting up a developer workstation ##
 This will document the installation steps to get the MiSeq QC reports running
 locally on your workstation.
 
 The steps are for Eclipse with EPIC on Ubuntu, adapt as needed to your preferred
 IDE or operating system.
 
-1. Check the version of Java you have installed:
+### Eclipse and EPIC ###
+1. Eclipse runs on Java, so check the version of Java you have installed:
 
         java -version
  
@@ -29,36 +69,39 @@ IDE or operating system.
 
         sudo apt-get install eclipse
 
-   [eclipse]: https://www.eclipse.org/downloads/
 
 6. Launch Eclipse. From the Help menu, choose either Eclipse Marketplace... or 
    Install New Software....
 
 7. In the marketplace, just type EPIC and search. In the install wizard, use
    the [EPIC update site][epic].
-[epic]: http://e-p-i-c.sf.net/updates/
 
-7. From the Window menu, choose Preferences, and navigate down to Perl EPIC:
+8. From the Window menu, choose Preferences, and navigate down to Perl EPIC:
    Editor.
    * Use spaces instead of tabs.
    * Insert 4 spaces on indent.
    * Show line numbers (your choice)
    * Show print margin (your choice)
 
-8. From the File menu, choose Import.... Navigate down to Git: Projects from Git.
+9. From the File menu, choose Import.... Navigate down to Git: Projects from Git.
 
-9. Choose Clone URI, and paste this URI: 
+10. Choose Clone URI, and paste this URI: 
    https://github.com/cfe-lab/MiSeqQCReport.git
 
-10. Ask your supervisor for the password, and use the defaults for everything 
-    else. Select the new project wizard with a Perl project.
+11. Use the defaults, and choose "Import existing projects."
 
-11. Change the folder to point at the new miseq_qc_report folder created by git,
-    and finish the import.
+12. Copy the `QC_Reports/Settings_template.pm` file to `Settings.pm`, and modify
+    the settings to match your environment.
 
-12. Install [Oracle Instant Client][oracle]. Use the basic lite version, and 
-    test that sqlplus works. You will probably have to follow the steps to set 
-    up the libraries, and you may have to run sqlplus64 instead of sqlplus.
+[eclipse]: https://www.eclipse.org/downloads/
+[epic]: http://e-p-i-c.sf.net/updates/
+
+### Database Software ###
+1. Install [Oracle Instant Client][oracle]. Use the basic lite version, and 
+    test that sqlplus works by using the following command with *USER* and *SID*
+    replaced by the correct values for your environment. You will probably have
+    to follow the steps to set up the libraries, and you may have to run
+    sqlplus64 instead of sqlplus.
 
         sqlplus USER@\"//192.168.?.?:1521/SID\"
 
@@ -72,13 +115,11 @@ IDE or operating system.
         sudo vi /etc/profile.d/oracle.sh # Add the following line:
         export ORACLE_HOME=/usr/lib/oracle/12.1/client64
 
-[oracle]: https://help.ubuntu.com/community/Oracle%20Instant%20Client
-
-13. Install Perl's Database Interface package (DBI), File::Rsync, and XML::Simple.
+2. Install Perl's Database Interface package (DBI), File::Rsync, and XML::Simple.
 
         sudo apt-get install libdbi-perl libfile-rsync-perl libxml-simple-perl
 
-14. Install DBD::Oracle CPAN module. The first command will begin the 
+3. Install DBD::Oracle CPAN module. The first command will begin the 
     installation of CPAN, just accept the defaults. It will eventually open a
     `cpan>` prompt where you can enter the second command. That eventually
     opens a root shell where you can enter the rest.
@@ -97,17 +138,17 @@ IDE or operating system.
     suitable *.mk", replace "perl Makefile.PL" with "perl Makefile.PL
     -l".
 
-14. Repeat the above commands, without the oracle.sh part, for the
+4. Repeat the above commands, without the oracle.sh step, for the
     packages IPC::System::Simple, File::Rsync, and POSIX::strptime.
 
-14. Copy the `QC_Reports/Settings_template.pm` file, and modify the settings to
-    match your environment.
+[oracle]: https://help.ubuntu.com/community/Oracle%20Instant%20Client
 
-14. Install the Cairo development library.
+### R and StatET ###
+1. Install the Cairo development library.
         
         sudo apt-get install libcairo2-dev
 
-15. Install R. The last two commands are run in the R console, and you should
+2. Install R. The last two commands are run in the R console, and you should
     check the [StatET installation page][statet] to see exactly which version
     of the rj package is compatible with the version of StatET you are going to
     install. You also need to install the R2HTML and Cairo packages.
@@ -119,29 +160,27 @@ IDE or operating system.
         install.packages("Cairo")
         q()
 
-[statet]: http://www.walware.de/it/statet/installation.mframe
-
-16. Launch Eclipse. For some reason, you can't currently install StatET from the
+3. Launch Eclipse. For some reason, you can't currently install StatET from the
     Eclipse Marketplace, so from the Help menu, choose Install New Software....
 
-17. Go to the [StatET installation page][statet], and find the update site for
+4. Go to the [StatET installation page][statet], and find the update site for
     your version of Eclipse. Paste that address in the install wizard, and 
     select the StatET for R component. Finish the installation.
 
-18. From the Window menu, choose Preferences. Navigate down to StatET: 
+5. From the Window menu, choose Preferences. Navigate down to StatET: 
     Run/Debug: R Environments.
 
-19. Click the Add... button.
+6. Click the Add... button.
 
-20. Next to the Location (R_HOME) field, press the + button, and choose Try
+7. Next to the Location (R_HOME) field, press the + button, and choose Try
     find automatically. It should find the R you just installed.
 
-21. Click the Detect Default Properties/Settings button. Click OK. Click OK.
+8. Click the Detect Default Properties/Settings button. Click OK. Click OK.
 
-22. If you want an R console, open the Run menu, and choose 
+9. If you want an R console, open the Run menu, and choose 
     Run Configurations.... Select R Console and click the add button. Click Run.
 
-23. To run an R script with command-line arguments, modify the R console 
+10. To run an R script with command-line arguments, modify the R console 
     configuration by setting the working directory and adding this to the 
     Options/Arguments field with whatever CSV file name was created by the
     previous step:
@@ -150,43 +189,33 @@ IDE or operating system.
     
     Then you can use `source("2_generate_report.R")` in the console to launch it.
 
-24. If you get an error about a missing font -adobe-helvetica-...,
+11. If you get an error about a missing font -adobe-helvetica-...,
     install the gsfonts-x11 package and refresh your font cache.
 
         sudo apt-get install gsfonts-x11
         xset fp rehash
 
+[statet]: http://www.walware.de/it/statet/installation.mframe
+
+## Running the Software on Your Workstation ##
+You will need to set up some folders with test data, and you will also want to
+have a test database that you can upload the data to. See the QAI source code
+for instructions on setting up the test database.
+
+1. Create a folder for the raw data, such as `~/data/RAW_DATA/MiSeq/runs`.
+2. Choose a recent run folder, and create a local copy under the raw data
+    folder. You don't need all the data, just the following:
+    * `Interop` folder
+    * `SampleSheet.csv`
+    * `RunInfo.xml`
+    * `runParameters.xml`
+3. Edit `Settings.pm` and make sure that `raw_data_path` points at your raw data
+    folder.
+
+## Running the Software on the Server ##
 The reports are currently run on a virtual machine by a certain user,
 and then displayed on the local network. They are scheduled under that
 virtual machine's user's crontab at 8:00 AM each day. You can see the
 tasks by logging in as that user and then typing `crontab -l`. For the
 IP addresses of the machine, and the user as whom you must log on, ask
 your supervisor.
-
-
-Setting up Oracle
-=================
-
-To run the scripts, you will need access to certain Oracle tables.
-
-1. Ask the database administrator to create an account for you, with
-   read access to the MiSeqQC_* tables. This will need to be okayed by
-   the lab director. You will be told the default password. Also ask for
-   the IP address, port, and SID for the Oracle database.
-
-2. The account will be created with a default password. Log in for the
-   first time, and change the password.
-
-        sqlplus username/password@//dbhost:1521/SID
-
-   You will be prompted to enter a new password. Oracle passwords at the
-   CfE must conform to the following guidelines:
-       * Password can not be same as username
-       * Password must be different than previous 3 passwords
-       * Password must be at least 8 characters long
-       * Password must begin with letter (all letters in uppercase)
-       * Password must contain at least two digits
-       * Password must contain at least one punctuation !"#$%&()*+,-/:;<=>?_
-   If you have chosen a password which fulfills all these criteria, but
-   get errors about an invalid login, contact the database administrator
-   and ask to set your password on her computer.

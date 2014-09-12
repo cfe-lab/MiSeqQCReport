@@ -1,16 +1,14 @@
-#!/usr/bin/perl
-
 # This file opens up a SampleSheet.csv and extracts Conan's sample sheet creation date
 # This date is then returned in YYYY-MM-DD format.
 
 use strict;
-use Date::Format;
+use Date::Format 'time2str';
 use Date::Parse;
 use File::Basename;
-use POSIX qw/strftime/;
+use POSIX 'strftime';
 
 # input: full path to a miseq run
-sub getSampleSheetDate() {
+sub getSampleSheetDate {
 
 	# Check for folders containing leading date + check for a SampleSheet
 	my ($path) = @_;
@@ -32,6 +30,6 @@ sub getSampleSheetDate() {
 	my $year = time2str("%Y", $parsed_date);
 	if (($year < 2010) || ($year > 2020)) { next; }
 	return time2str("%Y-%m-%d", $parsed_date);
-	}
+}
 
 1;

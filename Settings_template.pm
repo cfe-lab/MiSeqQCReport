@@ -17,6 +17,9 @@ sub new {
         password => "??????",
         schema => "??????",
         
+        # Where to find raw data for uploading
+        raw_data_path => "/path/to/RAW_DATA/MiSeq/runs",
+        
         # This is an rsync path.
         dist_path => "dist",
         

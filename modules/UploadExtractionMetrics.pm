@@ -18,16 +18,11 @@
 #		intervals since Gregorian midnight, January
 #		1st, 0001.
 
-sub uploadExtractionMetrics {
-	if (scalar(@_) != 2) { die "Correct syntax: uploadExtractionMetrics(RunID, binFile)"; }
-	my ($RunID, $binFile) = @_;
-	open(INPUT, $binFile) || die "Couldn't open $binFile";
+use strict;
 
-	require "/path/to/source/QC_InterOp_Upload/scriptDependencies/setup_oracle_authentication.pl";
-	my ($env_oracle_home, $host, $port, $sid, $user, $password) = activateOracle();
-	$ENV{ORACLE_HOME} = $env_oracle_home;
-	use DBI;
-	my $db=DBI->connect("dbi:Oracle:host=$host;sid=$sid;port=$port", $user, $password, {PrintError => 0, PrintWarn => 1, AutoCommit => 0});
+sub uploadExtractionMetrics($$$) {
+	my ($RunID, $binFile, $db) = @_;
+	open(INPUT, $binFile) || die "Couldn't open $binFile";
 
 	local $/;						# Slurp mode: 	Prevent incorrect newline interpretation of binary data
 	my $line = <INPUT>;
@@ -37,13 +32,13 @@ sub uploadExtractionMetrics {
 														# f: single precision float 	[4 bytes]
 														# V: unsigned long (uint32) 	[4 bytes]
 														# B: bit string - little endian?
-	$c = 2;
+	my $c = 2;
 	my $count = 1;
 	while (defined($f[$c])) {
 		my 	($lane, $tile, $cycle, $fwhm_A, $fwhm_C, $fwhm_G, $fwhm_T, $int_A, $int_C, $int_G, $int_T, $timeBitString) =
 			($f[$c+0], $f[$c+1], $f[$c+2], $f[$c+3], $f[$c+4], $f[$c+5], $f[$c+6], $f[$c+7], $f[$c+8], $f[$c+9], $f[$c+10], $f[$c+11]);
 
-		my $query =     "INSERT INTO specimen.MiSeqQC_ExtractionMetrics " .
+		my $query =     "INSERT INTO MiSeqQC_ExtractionMetrics " .
 						"(RunID, lane, tile, cycle, " .
 						"fwhm_A, fwhm_C, fwhm_G, fwhm_T, intensity_A, intensity_C, intensity_G, intensity_T) VALUES " .
 						"('$RunID', '$lane', '$tile', '$cycle', " .
@@ -54,18 +49,19 @@ sub uploadExtractionMetrics {
 		if ( $sth->err ) {
 			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
 			$db->rollback();
+
+            # TODO: return to calling script and skip this run.
 			$db->disconnect();
 			die '';
 			}
 
 		$c+= 12;
-		if ($count % 2500 == 0) { @t = localtime(time); $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - ExtractionMetrics, record $count\n"; }
+		if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - ExtractionMetrics, record $count\n"; }
 		$count++;
 		}
 	close(INPUT);						# File is large - close gracefully
 	undef $line;						# Variable is large - clear gracefully
 	$db->commit();
 	print "Committed transaction for ExtractionMetrics!\n\n";
-	$db->disconnect();
 	}
 1;

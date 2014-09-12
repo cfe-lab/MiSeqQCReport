@@ -21,19 +21,11 @@
 #
 # 4 bytes: signal to noise ratio	[float]
 
-use DBI;
-use DBD::Oracle;
+use strict;
 
-sub uploadCorrectedIntensityMetrics {
-	if (scalar(@_) != 2) { die "Correct syntax: uploadCorrectedIntensityMetrics(RunID, binFile)"; }
-	my ($RunID, $binFile) = @_;
+sub uploadCorrectedIntensityMetrics($$$) {
+	my ($RunID, $binFile, $db) = @_;
 	open(INPUT, $binFile) || die "Couldn't open $binFile";
-
-	require "/path/to/source/QC_InterOp_Upload/scriptDependencies/setup_oracle_authentication.pl";
-	my ($env_oracle_home, $host, $port, $sid, $user, $password) = activateOracle();
-	$ENV{ORACLE_HOME} = $env_oracle_home;
-	use DBI;
-	my $db=DBI->connect("dbi:Oracle:host=$host;sid=$sid;port=$port", $user, $password, {PrintError => 0, PrintWarn => 1, AutoCommit => 0});
 
 	local $/;						# Slurp mode: 	Prevent incorrect newline interpretation of binary data
 	my $line = <INPUT>;
@@ -41,7 +33,7 @@ sub uploadCorrectedIntensityMetrics {
 	my @f = unpack("cc(SSSSSSSSSSSSLLLLLf)*", $line);	# c: signed char		[1 byte]
 	my ($fileVersion, $numRecords) = ($f[0], $f[1]);	# S: unsigned short (uint16)	[2 bytes]
 														# f: single precision float	[4 bytes]
-	$c = 2;												# L: unsigned long		[4 bytes]
+	my $c = 2;												# L: unsigned long		[4 bytes]
 
 	my $count = 1;
 	while (defined($f[$c])) {
@@ -57,7 +49,7 @@ sub uploadCorrectedIntensityMetrics {
 
 		if ($SNR eq 'nan') { $SNR = -1; }
 
-		my $query = 	"INSERT INTO Specimen.MiSeqQC_CorrectedIntensities " .
+		my $query = 	"INSERT INTO MiSeqQC_CorrectedIntensities " .
 						"(RunID, lane, tile, cycle, averageIntensity, " .
 						"correctedIntensity_A, correctedIntensity_C, correctedIntensity_G, correctedIntensity_T, " .
 						"numCalls_noCall, numCalls_A, numCalls_C, numCalls_G, numCalls_T, Signal_to_noise) VALUES " .
@@ -70,18 +62,20 @@ sub uploadCorrectedIntensityMetrics {
 		if ( $sth->err ) {
 			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
 			$db->rollback();
+			
+			# TODO: return to calling script and skip this run.
 			$db->disconnect();
 			die '';
 			}
 
 		$c+= 18;
-		if ($count % 2500 == 0) { @t = localtime(time); $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - CorrectedIntensities, record $count\n"; }
+		if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - CorrectedIntensities, record $count\n"; }
 		$count++;
 		}
 	close(INPUT);
 	undef $line;
 	$db->commit();
-	print "Committed transaction for specimen.MiSeqQC_CorrectedIntensities!\n\n";
-	$db->disconnect();
-	}
+	print "Committed transaction for MiSeqQC_CorrectedIntensities!\n\n";
+}
+
 1;

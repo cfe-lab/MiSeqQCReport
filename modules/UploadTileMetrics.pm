@@ -26,20 +26,14 @@
 # 300+(N-1) - percent aligned
 # N=1 300, N=2 301, N=3 302, N=4 303
 
+use strict;
 use DBI;
 use DBD::Oracle;
 
-sub uploadTileMetrics {
+sub uploadTileMetrics($$$) {
 
-	if (scalar(@_) != 2) { die "Correct syntax: $0 (RunID, binFile)"; }
-        my ($RunID, $binFile, $debug) = @_;
+        my ($RunID, $binFile, $db) = @_;
 	open(INPUT, $binFile) || die "Couldn't open $binFile";
-
-	require "/home/emartin/QC_InterOp_Upload/scriptDependencies/setup_oracle_authentication.pl";
-	my ($env_oracle_home, $host, $port, $sid, $user, $password) = activateOracle();
-	$ENV{ORACLE_HOME} = $env_oracle_home;
-	use DBI;
-	my $db=DBI->connect("dbi:Oracle:host=$host;sid=$sid;port=$port", $user, $password, {PrintError => 0, PrintWarn => 1, AutoCommit => 0});
 
 	local $/;											# Slurp mode: 	Prevent incorrect newline interpretation of binary data
 	my $line = <INPUT>;
@@ -48,20 +42,24 @@ sub uploadTileMetrics {
 
 	my ($fileVersion, $numRecords) = ($f[0], $f[1]);	# S: unsigned short (uint16) [2 bytes]
 														# f: single precision float [4 bytes]
-	$c = 2;
+	my $c = 2;
 	my $count = 1;
 	while (defined($f[$c])) {
 		my ($lane, $tile, $tileMetricCode, $tileMetricValue) = ($f[$c], $f[$c+1], $f[$c+2], $f[$c+3], $f[$c+4]);
 		if ($tileMetricCode =~ m/^400$/) { $c += 4; next; }
 
-		my $query =	"INSERT INTO specimen.MiSeqQC_TileMetrics (RunID, lane, tile, metricCode, value) VALUES " .
+		my $query =	"INSERT INTO MiSeqQC_TileMetrics (RunID, lane, tile, metricCode, value) VALUES " .
 				"('$RunID', '$lane', '$tile', '$tileMetricCode', '$tileMetricValue')";
 
 		my $sth = $db->prepare($query); $sth->execute();
-		if ($count % 100 == 0) { @t = localtime(time); $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - TileMetrics, Record $count\n"; }
+		if ($count % 100 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - TileMetrics, Record $count\n"; }
 		if ( $sth->err ) {
 			print "\nERROR! ROLLING BACK TRANSACTION...\n\nError msg: " . $sth->errstr . "\n\n";
-			$db->rollback(); $db->disconnect(); die '';
+			$db->rollback();
+
+            # TODO: return to calling script and skip this run.
+			$db->disconnect();
+			die '';
 			}
 		$c += 4;
 		$count++;
@@ -69,8 +67,8 @@ sub uploadTileMetrics {
 
 	$db->commit();
 	print "Committed transaction for TileMetrics!\n\n";
-	$db->disconnect();
 	close(INPUT);						# File is large - close gracefully
 	undef $line;						# Variable is large - clear gracefully
-	}
+}
+
 1;
