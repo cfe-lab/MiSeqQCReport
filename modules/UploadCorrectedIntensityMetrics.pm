@@ -49,16 +49,45 @@ sub uploadCorrectedIntensityMetrics($$$) {
 
         if ($SNR eq 'nan') { $SNR = -1; }
 
-        my $query =     "INSERT INTO MiSeqQC_CorrectedIntensities " .
-                        "(RunID, lane, tile, cycle, averageIntensity, " .
-                        "correctedIntensity_A, correctedIntensity_C, correctedIntensity_G, correctedIntensity_T, " .
-                        "numCalls_noCall, numCalls_A, numCalls_C, numCalls_G, numCalls_T, Signal_to_noise) VALUES " .
-                        "('$RunID', '$lane', '$tile', '$cycle', '$avgIntensity', " .
-                        " '$correctedInt_A', '$correctedInt_C', '$correctedInt_G', '$correctedInt_T', " .
-                        " '$calls_none', '$calls_A', '$calls_C', '$calls_T', '$calls_G', '$SNR')";
-
+        my $query = q{
+            INSERT
+            INTO    MiSeqQC_CorrectedIntensities
+                    (
+                    RunID,
+                    lane,
+                    tile,
+                    cycle,
+                    averageIntensity,
+                    correctedIntensity_A,
+                    correctedIntensity_C,
+                    correctedIntensity_G,
+                    correctedIntensity_T,
+                    numCalls_noCall,
+                    numCalls_A,
+                    numCalls_C,
+                    numCalls_G,
+                    numCalls_T,
+                    Signal_to_noise
+                    )
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        };
         my $sth = $db->prepare($query);
-        $sth->execute();
+        $sth->execute(
+            $RunID,
+            $lane,
+            $tile,
+            $cycle,
+            $avgIntensity,
+            $correctedInt_A,
+            $correctedInt_C,
+            $correctedInt_G,
+            $correctedInt_T,
+            $calls_none,
+            $calls_A,
+            $calls_C,
+            $calls_T,
+            $calls_G,
+            $SNR);
 
         $c+= 18;
         if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - CorrectedIntensities, record $count\n"; }
