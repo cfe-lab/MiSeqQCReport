@@ -8,3 +8,4 @@ Settings.pm
 !/working/_README.md
 /upload_working/*
 !/upload_working/_README.md
+/last_run.txt

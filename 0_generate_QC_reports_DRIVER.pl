@@ -19,6 +19,6 @@ my $rsync = new File::Rsync({
     delete => 1
 });
 $rsync->exec({
-    src => 'reports/',
+    src => $settings->{'sites_path'} . '/',
     exclude => ['_README.md'],
     dest => $settings->{'dist_path'}}) or die("Rsync failed $!");

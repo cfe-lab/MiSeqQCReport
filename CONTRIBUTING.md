@@ -156,9 +156,14 @@ IDE or operating system.
         sudo apt-get install r-base r-base-dev
         sudo R
         install.packages(c("rj", "rj.gd"), repos="http://download.walware.de/rj-1.1")
-        install.packages("R2HTML")
         install.packages("Cairo")
         q()
+
+2. The latest version of the R2HTML package doesn't seem to work, so you have
+    download an old version.
+
+        wget http://cran.r-project.org/src/contrib/Archive/R2HTML/R2HTML_2.2.1.tar.gz
+        sudo R CMD INSTALL R2HTML_2.2.1.tar.gz
 
 3. Launch Eclipse. For some reason, you can't currently install StatET from the
     Eclipse Marketplace, so from the Help menu, choose Install New Software....
@@ -184,9 +189,9 @@ IDE or operating system.
     configuration by setting the working directory and adding this to the 
     Options/Arguments field with whatever CSV file name was created by the
     previous step:
-    
+
         --args working/2014-06-25.csv
-    
+
     Then you can use `source("2_generate_report.R")` in the console to launch it.
 
 11. If you get an error about a missing font -adobe-helvetica-...,
@@ -194,6 +199,20 @@ IDE or operating system.
 
         sudo apt-get install gsfonts-x11
         xset fp rehash
+
+12. If you need to troubleshoot versions, try the following on the server and on
+    your workstation, looking particularly at the packages you installed above:
+
+        R --version
+        R
+        installed.packages()[,c("Package","Version")]
+
+13. If you have trouble with the latest R2HTML package, here's how to downgrade
+    to an older version:
+
+        sudo R CMD REMOVE R2HTML
+        wget http://cran.r-project.org/src/contrib/Archive/R2HTML/R2HTML_2.2.1.tar.gz
+        sudo R CMD INSTALL R2HTML_2.2.1.tar.gz
 
 [statet]: http://www.walware.de/it/statet/installation.mframe
 
