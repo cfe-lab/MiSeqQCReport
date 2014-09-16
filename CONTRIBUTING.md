@@ -239,3 +239,35 @@ virtual machine's user's crontab at 8:00 AM each day. You can see the
 tasks by logging in as that user and then typing `crontab -l`. For the
 IP addresses of the machine, and the user as whom you must log on, ask
 your supervisor.
+
+### Releases ###
+This section assumes you already have a working server up and running, and you
+just want to publish a new release. Follow these steps:
+
+1. Make sure the code works in your development environment. Also check that all
+    the issues in the current milestone are closed.
+2. Determine what version number should be used next.
+3. [Create a release][release] on Github. Use "vX.Y" as the tag. If you have to
+    redo a release, you can create additional releases with tags vX.Y.1, vX.Y.2,
+    and so on.
+4. Get the code from Github onto the server.
+        ssh user@server
+        cd /home/user/MiSeqQCReport
+        git fetch
+        git checkout tags/vX.Y
+5. Check if you need to set any new settings by running
+    `diff settings_default.py settings.py`.
+6. Close the milestone for this release, create one for the next release, and
+    decide which issues you will include in that milestone.
+
+[release]: https://help.github.com/categories/85/articles
+
+### Installing ###
+If you're setting up a new server, follow similar steps to setting up a
+development workstation. You will also need to configure a cron job by typing
+`crontab -e` and then adding two lines like this:
+
+    0 4 * * * cd /home/USER/MiSeqQCReport; /usr/bin/perl upload_QC_data_for_pending_miseq_runs.pl
+    0 6 * * * cd /home/USER/MiSeqQCReport; /usr/bin/perl 0_generate_QC_reports_DRIVER.pl
+
+You should replace *USER* with your user name.
