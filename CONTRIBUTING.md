@@ -231,6 +231,9 @@ for instructions on setting up the test database.
     * `needsprocessing`
 3. Edit `Settings.pm` and make sure that `raw_data_path` points at your raw data
     folder.
+4. Create records in lab_miseq_run for each run that you are going to upload.
+5. Execute the Perl scripts upload_QC_data_for_pending_miseq_runs.pl and
+    0_generate_QC_reports_DRIVER.pl.
 
 ## Running the Software on the Server ##
 The reports are currently run on a virtual machine by a certain user,
@@ -267,7 +270,7 @@ If you're setting up a new server, follow similar steps to setting up a
 development workstation. You will also need to configure a cron job by typing
 `crontab -e` and then adding two lines like this:
 
-    0 4 * * * cd /home/USER/MiSeqQCReport; /usr/bin/perl upload_QC_data_for_pending_miseq_runs.pl
-    0 6 * * * cd /home/USER/MiSeqQCReport; /usr/bin/perl 0_generate_QC_reports_DRIVER.pl
+    0 4 * * * cd /home/***USER***/MiSeqQCReport; /usr/bin/perl upload_QC_data_for_pending_miseq_runs.pl
+    0 6 * * * cd /home/***USER***/MiSeqQCReport; /usr/bin/perl 0_generate_QC_reports_DRIVER.pl
 
 You should replace *USER* with your user name.

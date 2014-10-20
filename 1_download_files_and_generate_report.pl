@@ -35,7 +35,7 @@ my @lastRunInDB = parse_date($sth->fetchrow(), '%d-%b-%y');
 
 # Only report on runs we haven't done before.
 # TODO: this seems like an amaturish solution.
-my @lastRunReported = undef;
+my @lastRunReported = 0;
 my $timestamp = undef;
 my ($mday, $mon, $year) = undef;;
 if (-e "last_run.txt") {
@@ -77,7 +77,7 @@ my $folderName = strftime($settings->{'date_format'}, localtime);
 my $reportFolder = "$sitesFolder/$folderName";
 unless (-e $reportFolder) { mkdir($reportFolder); }
 
-system("/usr/bin/env Rscript 2_generate_report.R $dir/$fileName $reportFolder > /dev/null 2>&1");
+system("/usr/bin/env Rscript 2_generate_report.R $dir/$fileName $reportFolder"); # > /dev/null 2>&1");
 rename("report.html", "$reportFolder/index.html");
 copy("R2HTML.css", "$reportFolder/R2HTML.css");
 unlink("$dir/$fileName"); # delete csv
