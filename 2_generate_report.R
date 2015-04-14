@@ -131,7 +131,6 @@ rownames(reagent.list) <- reagent.list$reagent
 data$RUNSTARTDATE <- as.Date(data$RUNSTARTDATE, "%d-%b-%y")
 expiration.cols <- paste0(reagent.list$reagent, "_EXPIRATION")
 data[,expiration.cols] <- lapply(data[,expiration.cols], as.Date, format="%d-%b-%y")
-data <- data[order(data$RUNSTARTDATE),]
 
 # Collect missing runs, and remove from further analysis.
 missing.runs <- data[is.na(data$RUNID.1),]

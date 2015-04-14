@@ -49,7 +49,7 @@ sub uploadErrorMetrics($$$) {
 	close(INPUT);
 	undef $line;
 	$db->commit();
-	print "Committed transaction for CorrectedIntensityMetrics!\n\n";
+	print "Committed transaction for ErrorMetrics!\n\n";
 }
 
 1;

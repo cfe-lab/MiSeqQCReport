@@ -38,6 +38,11 @@ accounts, and you will need an account to test the Oracle client software.
    If you have chosen a password which fulfills all these criteria, but
    get errors about an invalid login, contact the database administrator
    and ask to set your password on her computer.
+   
+   After some time, you will get warned that your password will expire soon.
+   Choose a new password, and then execute this SQL statement:
+   
+       alter user USER identified by NEW_PASSWORD replace OLD_PASSWORD;
 
 ## Setting up a developer workstation ##
 This will document the installation steps to get the MiSeq QC reports running
@@ -148,7 +153,7 @@ IDE or operating system.
         
         sudo apt-get install libcairo2-dev
 
-2. Install R. The last two commands are run in the R console, and you should
+2. Install R. The last three commands are run in the R console, and you should
     check the [StatET installation page][statet] to see exactly which version
     of the rj package is compatible with the version of StatET you are going to
     install. You also need to install the R2HTML and Cairo packages.
@@ -249,7 +254,8 @@ just want to publish a new release. Follow these steps:
 
 1. Make sure the code works in your development environment. Also check that all
     the issues in the current milestone are closed.
-2. Determine what version number should be used next.
+2. Determine what version number should be used next, and update the comment in
+    `0_generate_QC_reports_DRIVER.pl`.
 3. [Create a release][release] on Github. Use "vX.Y" as the tag. If you have to
     redo a release, you can create additional releases with tags vX.Y.1, vX.Y.2,
     and so on.

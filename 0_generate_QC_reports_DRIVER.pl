@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+# QC data upload script v1.1
+
 use strict;
 use autodie qw(:all);
 
