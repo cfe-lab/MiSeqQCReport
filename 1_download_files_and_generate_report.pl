@@ -28,7 +28,10 @@ my $db=DBI->connect(
 
 +# Get latest run date.
 my $query = "SELECT MAX(TO_DATE(L.RUNNAME, 'DD-MON-YY')) " .
-            "FROM $settings->{'schema'}.Lab_Miseq_Run L ";
+            "FROM $settings->{'schema'}.Lab_Miseq_Run L " .
+            "JOIN $settings->{'schema'}.MiSeqQC_RunParameters R " .
+            "ON TO_DATE(L.RUNNAME, 'DD-MON-YYYY') = " .
+            "   TO_DATE(REGEXP_SUBSTR(EXPERIMENTNAME, '\\d{1,2}-\\w{3,4}-\\d{2,4}')) ";
 my $sth = $db->prepare($query);
 $sth->execute();
 my @lastRunInDB = parse_date($sth->fetchrow(), '%d-%b-%y');
