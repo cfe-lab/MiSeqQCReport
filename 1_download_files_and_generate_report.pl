@@ -63,7 +63,10 @@ $query = "SELECT L.RUNNAME, R.*, I.* FROM $settings->{'schema'}.Lab_MiSeq_Run L 
          "   TO_DATE(REGEXP_SUBSTR(EXPERIMENTNAME, '\\d{1,2}-\\w{3,4}-\\d{2,4}')) " .
          "LEFT JOIN $settings->{'schema'}.MiSeqQC_InterOpSummary I " .
          "ON R.RUNID = I.RUNID " .
-         "WHERE R.RUNSTARTDATE IS NULL OR R.RUNSTARTDATE >= TO_DATE('$settings->{'start_date'}', 'DD-MON-YY') " .
+         "WHERE L.IS_ABANDONED = 0 " .
+         "AND   (  R.RUNSTARTDATE IS NULL " .
+         "      OR R.RUNSTARTDATE >= TO_DATE('$settings->{'start_date'}', 'DD-MON-YY') " .
+         "      ) " .
          "ORDER BY TO_DATE(L.RUNNAME, 'DD-MON-YYYY')";
 $sth = $db->prepare($query);
 $sth->execute();
