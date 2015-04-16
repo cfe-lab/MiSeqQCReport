@@ -265,7 +265,7 @@ just want to publish a new release. Follow these steps:
         git fetch
         git checkout tags/vX.Y
 5. Check if you need to set any new settings by running
-    `diff settings_default.py settings.py`.
+    `diff Settings_template.pm Settings.pm`.
 6. Close the milestone for this release, create one for the next release, and
     decide which issues you will include in that milestone.
 
