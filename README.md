@@ -49,6 +49,10 @@ Developer notes
 
 If you are not a programmer, you do not need to read this section.
 
+Active issues can be seen on [the project planning board][waffle].
+
+[waffle]: https://waffle.io/cfe-lab/miseqqcreport
+
 Database information
 --------------------
 
