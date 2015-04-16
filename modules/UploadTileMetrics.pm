@@ -48,10 +48,26 @@ sub uploadTileMetrics($$$) {
 		my ($lane, $tile, $tileMetricCode, $tileMetricValue) = ($f[$c], $f[$c+1], $f[$c+2], $f[$c+3], $f[$c+4]);
 		if ($tileMetricCode =~ m/^400$/) { $c += 4; next; }
 
-		my $query =	"INSERT INTO MiSeqQC_TileMetrics (RunID, lane, tile, metricCode, value) VALUES " .
-				"('$RunID', '$lane', '$tile', '$tileMetricCode', '$tileMetricValue')";
+        my $query = q{
+            INSERT
+            INTO    MiSeqQC_TileMetrics
+                    (
+                    RunID,
+                    lane,
+                    tile,
+                    metricCode,
+                    value
+                    )
+            VALUES (?, ?, ?, ?, ?)
+        };
 
-		my $sth = $db->prepare($query); $sth->execute();
+        my $sth = $db->prepare($query);
+        $sth->execute(
+            $RunID,
+            $lane,
+            $tile,
+            $tileMetricCode,
+            $tileMetricValue);
 		if ($count % 100 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - TileMetrics, Record $count\n"; }
 		$c += 4;
 		$count++;

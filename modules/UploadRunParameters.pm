@@ -38,24 +38,59 @@ sub uploadRunParameters($$$) {
 	my $index2 = $runInfoReads[2]->{'NumCycles'};
 	my $read2 = $runInfoReads[3]->{'NumCycles'};
 
-	my $query =	"SELECT * FROM MiSeqQC_RunParameters WHERE runID LIKE '$RunID'";
+    my $query = q{
+        INSERT
+        INTO    MiSeqQC_RunParameters
+                (
+                runID,
+                username,
+                experimentName,
+                runStartDate,
+                flowcell_serial,
+                flowcell_part_number,
+                flowcell_expiration,
+                PR2_serial,
+                PR2_part_number,
+                PR2_expiration,
+                reagentKit_serial,
+                reagentKit_part_number,
+                reagentKit_expiration,
+                MCS_version,
+                RTA_version,
+                FPGA_version,
+                read1,
+                index1,
+                index2,
+                read2,
+                sample_sheet_date
+                )
+        VALUES  (?, ?, ?, to_date(?, 'YYMMDD'), ?, ?, to_date(?, 'YYMMDD'), ?,
+                 ?, to_date(?, 'YYMMDD'), ?, ?, to_date(?, 'YYMMDD'), ?, ?, ?,
+                 ?, ?, ?, ?, to_date(?,'YYYY-MM-DD'))
+        };
 	my $sth = $db->prepare($query);
-	$sth->execute();
-
-	if ($sth->fetchrow_array()) { die "RunID exists in the database: $RunID"; }
-    $sth->finish();
-
-	$query = 	"INSERT INTO MiSeqQC_RunParameters " .
-				"(runID, username, experimentName, runStartDate, " .
-				"flowcell_serial, flowcell_part_number, flowcell_expiration, PR2_serial, PR2_part_number, PR2_expiration, " .
-				"reagentKit_serial, reagentKit_part_number, reagentKit_expiration, MCS_version, RTA_version, FPGA_version, " .
-				"read1, index1, index2, read2, sample_sheet_date) VALUES" .
-				"('$RunID', '$Username', '$ExperimentName', to_date('$RunStartDate', 'YYMMDD'), " .
-				"'$flowCellSerial', '$flowCellPart', to_date('$flowCellExpiration', 'YYMMDD'), '$PR2Serial', '$PR2Part', to_date('$PR2Expiration', 'YYMMDD'), " .
-				"'$reagentSerial', '$reagentPart', to_date('$reagentExpiration', 'YYMMDD'), '$MCSVersion', '$RTAVersion', '$FPGAVersion', " .
-				"'$read1', '$index1', '$index2', '$read2', to_date('$samplesheet_date','YYYY-MM-DD'))";
-	$sth = $db->prepare($query);
-	$sth->execute();
+	$sth->execute(
+       $RunID,
+       $Username,
+       $ExperimentName,
+       $RunStartDate,
+       $flowCellSerial,
+       $flowCellPart,
+       $flowCellExpiration,
+       $PR2Serial,
+       $PR2Part,
+       $PR2Expiration,
+       $reagentSerial,
+       $reagentPart,
+       $reagentExpiration,
+       $MCSVersion,
+       $RTAVersion,
+       $FPGAVersion,
+       $read1,
+       $index1,
+       $index2,
+       $read2,
+       $samplesheet_date);
 
 	$db->commit();
 

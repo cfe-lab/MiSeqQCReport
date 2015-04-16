@@ -33,11 +33,28 @@ sub uploadQualityMetrics($$$) {
 			my $qBin = ($j+1);
 			my $numClusters = $f[$c+$j];
     
-      my $query =	"INSERT INTO MiSeqQC_QualityMetrics " .
-        "(RunID, lane, tile, cycle, Q_bin, numClusters) VALUES " .
-        "('$RunID', '$lane', '$tile', '$cycle', '$qBin', '$numClusters')";
+            my $query = q{
+                INSERT
+                INTO    MiSeqQC_QualityMetrics
+                        (
+                        RunID,
+                        lane,
+                        tile,
+                        cycle,
+                        Q_bin,
+                        numClusters
+                        )
+                VALUES  (?, ?, ?, ?, ?, ?)
+            };
 
-                my $sth = $db->prepare($query); $sth->execute();
+            my $sth = $db->prepare($query);
+            $sth->execute(
+                $RunID,
+                $lane,
+                $tile,
+                $cycle,
+                $qBin,
+                $numClusters);
 
 			$j++;
 			if ($count % 25000 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - QualityMetrics, record $count\n"; }

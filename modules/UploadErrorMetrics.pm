@@ -34,13 +34,36 @@ sub uploadErrorMetrics($$$) {
 
 		$errorRate = sprintf("%.4f", $errorRate);
 
-		my $query =     "INSERT INTO MiSeqQC_ErrorMetrics " .
-						"(RunID, lane, tile, cycle, " .
-						"errorRate, numPerfectReads, numReadsOneError, numReadsTwoError, numReadsThreeError, numReadsFourError) VALUES " .
-						"('$RunID', '$lane', '$tile', '$cycle', " .
-						" '$errorRate', '$perfectReads', '$err1', '$err2', '$err3', '$err4')";
+        my $query = q{
+            INSERT
+            INTO    MiSeqQC_ErrorMetrics
+                    (
+                    RunID,
+                    lane,
+                    tile,
+                    cycle,
+                    errorRate,
+                    numPerfectReads,
+                    numReadsOneError,
+                    numReadsTwoError,
+                    numReadsThreeError,
+                    numReadsFourError
+                    )
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        };
 
-		my $sth = $db->prepare($query); $sth->execute();
+        my $sth = $db->prepare($query);
+        $sth->execute(
+            $RunID,
+            $lane,
+            $tile,
+            $cycle,
+            $errorRate,
+            $perfectReads,
+            $err1,
+            $err2,
+            $err3,
+            $err4);
 
 		if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - ErrorMetrics, record $count\n"; }
 		$count++;

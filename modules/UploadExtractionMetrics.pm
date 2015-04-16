@@ -38,13 +38,41 @@ sub uploadExtractionMetrics($$$) {
 		my 	($lane, $tile, $cycle, $fwhm_A, $fwhm_C, $fwhm_G, $fwhm_T, $int_A, $int_C, $int_G, $int_T, $timeBitString) =
 			($f[$c+0], $f[$c+1], $f[$c+2], $f[$c+3], $f[$c+4], $f[$c+5], $f[$c+6], $f[$c+7], $f[$c+8], $f[$c+9], $f[$c+10], $f[$c+11]);
 
-		my $query =     "INSERT INTO MiSeqQC_ExtractionMetrics " .
-						"(RunID, lane, tile, cycle, " .
-						"fwhm_A, fwhm_C, fwhm_G, fwhm_T, intensity_A, intensity_C, intensity_G, intensity_T) VALUES " .
-						"('$RunID', '$lane', '$tile', '$cycle', " .
-						" '$fwhm_A', '$fwhm_C', '$fwhm_G', '$fwhm_T', '$int_A', '$int_C', '$int_G', '$int_T')";
+        my $query = q{
+            INSERT
+            INTO    MiSeqQC_ExtractionMetrics
+                    (
+                    RunID,
+                    lane,
+                    tile,
+                    cycle,
+                    fwhm_A,
+                    fwhm_C,
+                    fwhm_G,
+                    fwhm_T,
+                    intensity_A,
+                    intensity_C,
+                    intensity_G,
+                    intensity_T
+                    )
+            VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        };
 
-		my $sth = $db->prepare($query); $sth->execute();
+
+        my $sth = $db->prepare($query);
+        $sth->execute(
+            $RunID,
+            $lane,
+            $tile,
+            $cycle,
+            $fwhm_A,
+            $fwhm_C,
+            $fwhm_G,
+            $fwhm_T,
+            $int_A,
+            $int_C,
+            $int_G,
+            $int_T);
 
 		$c+= 12;
 		if ($count % 2500 == 0) { my @t = localtime(time); my $time = "$t[2]:$t[1]:$t[0]";  print "[$time] $RunID - ExtractionMetrics, record $count\n"; }
