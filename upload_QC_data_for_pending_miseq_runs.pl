@@ -76,7 +76,7 @@ sub processRun($$$) {
         "$path/$qc_failure",
         "cp -r $path/InterOp $new_folder/",
         "cp $path/SampleSheet.csv $new_folder/",
-        "cp $path/runParameters.xml $new_folder/",
+        "cp $path/[rR]unParameters.xml $new_folder/runParameters.xml",
         "cp $path/RunInfo.xml $new_folder/");
 
     verifyInputFiles(

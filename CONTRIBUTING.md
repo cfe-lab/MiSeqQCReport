@@ -232,7 +232,7 @@ for instructions on setting up the test database.
     * `Interop` folder
     * `SampleSheet.csv`
     * `RunInfo.xml`
-    * `runParameters.xml`
+    * `runParameters.xml` or `RunParameters.xml`
     * `needsprocessing`
 3. Edit `Settings.pm` and make sure that `raw_data_path` points at your raw data
     folder.
