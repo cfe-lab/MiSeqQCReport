@@ -23,7 +23,7 @@ sub getSampleSheetDate {
     my $grep_match = `$command`;
     chomp $grep_match;
     my @fields = split(/,/,$grep_match);
-    my $samplesheet_date = $fields[1];
+    my $samplesheet_date = substr($fields[1], 0, 11);
 
     # Try to parse this date and check if it looks like it worked
     my $parsed_date = str2time($samplesheet_date);
