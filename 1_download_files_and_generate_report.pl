@@ -27,11 +27,10 @@ my $db=DBI->connect(
     {RaiseError => 1});
 
 +# Get latest run date.
-my $query = "SELECT MAX(TO_DATE(L.RUNNAME, 'DD-MON-YY')) " .
+my $query = "SELECT MAX(r.runstartdate) " .
             "FROM $settings->{'schema'}.Lab_Miseq_Run L " .
             "JOIN $settings->{'schema'}.MiSeqQC_RunParameters R " .
-            "ON TO_DATE(L.RUNNAME, 'DD-MON-YYYY') = " .
-            "   TO_DATE(REGEXP_SUBSTR(EXPERIMENTNAME, '\\d{1,2}-\\w{3,4}-\\d{2,4}')) ";
+            "ON L.RUNNAME = EXPERIMENTNAME ";
 my $sth = $db->prepare($query);
 $sth->execute();
 my @lastRunInDB = parse_date($sth->fetchrow(), '%d-%b-%y');
@@ -59,15 +58,14 @@ open(my $output, ">$dir/$fileName");
 # Dump data to a CSV file.
 $query = "SELECT L.RUNNAME, R.*, I.* FROM $settings->{'schema'}.Lab_MiSeq_Run L " .
          "LEFT JOIN $settings->{'schema'}.MiSeqQC_RunParameters R " .
-         "ON TO_DATE(L.RUNNAME, 'DD-MON-YYYY') = " .
-         "   TO_DATE(REGEXP_SUBSTR(EXPERIMENTNAME, '\\d{1,2}-\\w{3,4}-\\d{2,4}')) " .
+         "ON L.RUNNAME = EXPERIMENTNAME " .
          "LEFT JOIN $settings->{'schema'}.MiSeqQC_InterOpSummary I " .
          "ON R.RUNID = I.RUNID " .
          "WHERE L.IS_ABANDONED = 0 " .
          "AND   (  R.RUNSTARTDATE IS NULL " .
          "      OR R.RUNSTARTDATE >= TO_DATE('$settings->{'start_date'}', 'DD-MON-YY') " .
          "      ) " .
-         "ORDER BY TO_DATE(L.RUNNAME, 'DD-MON-YYYY')";
+         "ORDER BY TO_DATE(SUBSTR(L.RUNNAME, 1, 11), 'DD-MON-YYYY'), 'X'||SUBSTR(L.RUNNAME, 12)";
 $sth = $db->prepare($query);
 $sth->execute();
 
