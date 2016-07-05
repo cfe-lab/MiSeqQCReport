@@ -26,7 +26,7 @@ sub new {
     	# Where to put reports.
     	sites_path => "reports",
 
-        # Date format for file names. To the day in prod, to the minute in dev.
+        # Date format for file names.
         date_format => "%Y-%m-%d_%H%M",
 
         # When to start counting from.

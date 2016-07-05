@@ -31,12 +31,22 @@ sub uploadRunParameters($$$) {
 
 	# Get the read lengths
 	my @runInfoReads = @{$tags{'Reads'}->{'RunInfoRead'}};
-	my ($readLength1, $indexLength1, $indexLength2, $readLength2);
-	if (scalar(@runInfoReads) != 4) { die 'Missing run length data'; }
-	my $read1 = $runInfoReads[0]->{'NumCycles'};
-	my $index1 = $runInfoReads[1]->{'NumCycles'};
-	my $index2 = $runInfoReads[2]->{'NumCycles'};
-	my $read2 = $runInfoReads[3]->{'NumCycles'};
+	my ($read1, $index1, $index2, $read2);
+	if (scalar(@runInfoReads) == 4) {
+        $read1 = $runInfoReads[0]->{'NumCycles'};
+        $index1 = $runInfoReads[1]->{'NumCycles'};
+        $index2 = $runInfoReads[2]->{'NumCycles'};
+        $read2 = $runInfoReads[3]->{'NumCycles'};
+	}
+	elsif (scalar(@runInfoReads) == 3) {
+        $read1 = $runInfoReads[0]->{'NumCycles'};
+        $index1 = $runInfoReads[1]->{'NumCycles'};
+        $index2 = 0;
+        $read2 = $runInfoReads[2]->{'NumCycles'};
+    }
+    else {
+        die 'Missing run length data';
+	}
 
     my $query = q{
         INSERT
