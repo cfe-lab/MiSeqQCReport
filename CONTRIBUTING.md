@@ -42,7 +42,7 @@ accounts, and you will need an account to test the Oracle client software.
    After some time, you will get warned that your password will expire soon.
    Choose a new password, and then execute this SQL statement:
    
-       alter user USER identified by NEW_PASSWORD replace OLD_PASSWORD;
+        alter user USER identified by NEW_PASSWORD replace OLD_PASSWORD;
 
 ## Setting up a developer workstation ##
 This will document the installation steps to get the MiSeq QC reports running
