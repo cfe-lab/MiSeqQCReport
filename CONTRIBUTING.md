@@ -28,12 +28,12 @@ accounts, and you will need an account to test the Oracle client software.
 
    You will be prompted to enter a new password. Oracle passwords at the
    CfE must conform to the following guidelines:
-       * Password can not be same as username
-       * Password must be different than previous 3 passwords
-       * Password must be at least 8 characters long
-       * Password must begin with letter (all letters in uppercase)
-       * Password must contain at least two digits
-       * Password must contain at least one punctuation !"#$%&()*+,-/:;<=>?_
+   * Password can not be same as username
+   * Password must be different than previous 3 passwords
+   * Password must be at least 8 characters long
+   * Password must begin with letter (all letters in uppercase)
+   * Password must contain at least two digits
+   * Password must contain at least one punctuation !"#$%&()*+,-/:;<=>?_
        
    If you have chosen a password which fulfills all these criteria, but
    get errors about an invalid login, contact the database administrator
