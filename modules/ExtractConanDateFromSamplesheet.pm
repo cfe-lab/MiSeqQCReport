@@ -15,7 +15,7 @@ sub getSampleSheetDate {
     if (!(-d $path)) { next; }
     my $runID = basename($path);
     my $date = substr($runID,0,6);
-    if (!($date =~ m/[1][0-9]{5}/)) { next; }
+    if (!($date =~ m/[0-9]{6}/)) { next; }
     if (!(-e "$path/SampleSheet.csv")) { next; }
 
     # Extract Conan's sample sheet date
