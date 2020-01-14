@@ -260,10 +260,12 @@ just want to publish a new release. Follow these steps:
     redo a release, you can create additional releases with tags vX.Y.1, vX.Y.2,
     and so on.
 4. Get the code from Github onto the server.
+
         ssh user@server
         cd /home/user/MiSeqQCReport
         git fetch
         git checkout tags/vX.Y
+
 5. Check if you need to set any new settings by running
     `diff Settings_template.pm Settings.pm`.
 6. Close the milestone for this release, create one for the next release, and
