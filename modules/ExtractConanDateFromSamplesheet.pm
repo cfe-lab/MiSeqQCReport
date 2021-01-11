@@ -28,7 +28,7 @@ sub getSampleSheetDate {
     # Try to parse this date and check if it looks like it worked
     my $parsed_date = str2time($samplesheet_date);
     my $year = defined $parsed_date ? time2str("%Y", $parsed_date) : undef;
-    if ( ! defined $year || ($year < 2010) || ($year > 2020)) {
+    if ( ! defined $year || ($year < 2010) || ($year > 2099)) {
         die "Invalid date in sample sheet's project name: '$samplesheet_date'.";
     }
     return time2str("%Y-%m-%d", $parsed_date);
