@@ -1,10 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 # Looks for runs ready to be processed and upload their interop QC data into the Oracle database.
 
 use strict;
+use warnings;
 use File::Basename;
 use File::Path qw(make_path remove_tree);
+use FindBin 1.51 qw( $RealBin );
+use lib $RealBin;
 
 use Settings;
 use lib 'modules';
