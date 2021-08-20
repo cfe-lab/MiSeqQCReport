@@ -1,0 +1,15 @@
+  [Unit]
+  Description=MiSeqQC data upload
+  
+  [Service]
+  ExecStart=docker run --rm \
+    --env MISEQQC_DB_HOST --env MISEQQC_DB_USER --env MISEQQC_DB_PASSWORD \
+    --env MISEQQC_DB_SID \
+    --volume=/path/to/RAW_DATA/MiSeq/runs:/mnt/raw_data miseqqc_upload
+  EnvironmentFile=/etc/miseqqc_upload.conf
+  
+  # Allow the process to log its exit.
+  KillSignal=SIGINT
+  
+  [Install]
+  WantedBy=multi-user.target

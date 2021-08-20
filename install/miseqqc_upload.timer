@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer that launches the MiSeqQC data upload
+
+[Timer]
+# https://www.freedesktop.org/software/systemd/man/systemd.time.html#Calendar%20Events
+# Every hour, at 11 minutes past
+OnCalendar=*-*-* *:11:00
+
+# This activates the timer on (multi-user) startup.
+[Install]
+WantedBy=multi-user.target
