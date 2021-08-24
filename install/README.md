@@ -6,8 +6,10 @@ Copy each of the following files to the given directory, and review the contents
 * miseqqc_upload.service -> /etc/systemd/system
 * miseqqc_upload.timer -> /etc/systemd/system
 * miseqqc_upload.conf -> /etc
+* crontab_mail.py -> /opt
 
-Make sure all files are only readable by root.
+Make sure all files are only readable by root, although crontab_mail.py doesn't
+matter.
 
 Don't put the environment variables directly in the `.service` file, because
 its contents are visible to all users with `systemctl show miseqqc_upload`.
