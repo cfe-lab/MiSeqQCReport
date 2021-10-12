@@ -8,6 +8,7 @@ ExecStart=python3 /opt/crontab_mail.py \
   		  --level ERROR \
 		  --subject "MiSeqQC data upload" \
 		  --from "donotreply-docker@bccfe.ca" \
+		  -- \
 		  "list,of,to,email,addresses" \
 		  docker run --rm \
 		  --env MISEQQC_DB_HOST --env MISEQQC_DB_USER \
