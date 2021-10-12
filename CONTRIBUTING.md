@@ -234,19 +234,16 @@ for instructions on setting up the test database.
     * `RunInfo.xml`
     * `runParameters.xml` or `RunParameters.xml`
     * `needsprocessing`
-3. Edit `Settings.pm` and make sure that `raw_data_path` points at your raw data
-    folder.
-4. Create records in lab_miseq_run for each run that you are going to upload.
-5. Execute the Perl scripts upload_QC_data_for_pending_miseq_runs.pl and
-    0_generate_QC_reports_DRIVER.pl.
+3. Look at the `.conf` file in the `install` folder, and set those environment
+   variables on your workstation.
+4. Build the docker image from the source code, or pull the latest.
+5. Create records in lab_miseq_run for each run that you are going to upload.
+6. Run the docker image, as configured in the `.service` file in the `install`
+   folder.
 
 ## Running the Software on the Server ##
-The reports are currently run on a virtual machine by a certain user,
-and then displayed on the local network. They are scheduled under that
-virtual machine's user's crontab at 8:00 AM each day. You can see the
-tasks by logging in as that user and then typing `crontab -l`. For the
-IP addresses of the machine, and the user as whom you must log on, ask
-your supervisor.
+The reports are no longer run, and the uploads are run on a docker host. See the
+`install` folder for all the details.
 
 ### Releases ###
 This section assumes you already have a working server up and running, and you
@@ -254,31 +251,19 @@ just want to publish a new release. Follow these steps:
 
 1. Make sure the code works in your development environment. Also check that all
     the issues in the current milestone are closed.
-2. Determine what version number should be used next, and update the comment in
-    `0_generate_QC_reports_DRIVER.pl`.
-3. [Create a release][release] on Github. Use "vX.Y" as the tag. If you have to
+2. [Create a release][release] on Github. Use "vX.Y" as the tag. If you have to
     redo a release, you can create additional releases with tags vX.Y.1, vX.Y.2,
     and so on.
-4. Get the code from Github onto the server.
+3. Build the docker image, if you haven't already, then push it to docker hub.
+4. Pull the docker image onto the server, and check that the version you expect
+   is the latest. If not, you can explicitly tag it as `:latest`.
 
         ssh user@server
-        cd /home/user/MiSeqQCReport
-        git fetch
-        git checkout tags/vX.Y
+        sudo docker pull cfelab/miseqqc_upload:vX.Y
+        sudo docker pull cfelab/miseqqc_upload:latest
+        sudo docker images
 
-5. Check if you need to set any new settings by running
-    `diff Settings_template.pm Settings.pm`.
-6. Close the milestone for this release, create one for the next release, and
+5. Close the milestone for this release, create one for the next release, and
     decide which issues you will include in that milestone.
 
 [release]: https://help.github.com/categories/85/articles
-
-### Installing ###
-If you're setting up a new server, follow similar steps to setting up a
-development workstation. You will also need to configure a cron job by typing
-`crontab -e` and then adding two lines like this:
-
-    0 4 * * * cd /home/***USER***/MiSeqQCReport; /usr/bin/perl upload_QC_data_for_pending_miseq_runs.pl
-    0 6 * * * cd /home/***USER***/MiSeqQCReport; /usr/bin/perl 0_generate_QC_reports_DRIVER.pl
-
-You should replace *USER* with your user name.
