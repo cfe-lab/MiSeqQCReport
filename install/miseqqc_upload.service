@@ -13,7 +13,8 @@ ExecStart=python3 /opt/crontab_mail.py \
 		  docker run --rm \
 		  --env MISEQQC_DB_HOST --env MISEQQC_DB_USER \
 		  --env MISEQQC_DB_PASSWORD --env MISEQQC_DB_SID \
-		  --volume=/path/to/RAW_DATA/MiSeq/runs:/mnt/raw_data miseqqc_upload
+		  --volume=/path/to/RAW_DATA/MiSeq/runs:/mnt/raw_data \
+		  cfelab/miseqqc_upload:latest
 EnvironmentFile=/etc/miseqqc_upload.conf
 
 # Allow the process to log its exit.
