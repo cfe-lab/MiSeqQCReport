@@ -3,7 +3,7 @@ Description=MiSeqQC data upload
 
 [Service]
 # TODO: Update e-mail addresses to send errors to, and update path to RAW_DATA.
-ExecStart=python3 /opt/crontab_mail.py \
+ExecStart=/usr/bin/python3 /opt/crontab_mail.py \
   		  --log /var/log/miseqqc_upload.log \
   		  --level ERROR \
 		  --subject "MiSeqQC data upload" \
