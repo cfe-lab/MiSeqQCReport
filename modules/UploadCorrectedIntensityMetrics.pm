@@ -47,7 +47,7 @@ sub uploadCorrectedIntensityMetrics($$$) {
                 $f[$c+8], $f[$c+9], $f[$c+10], $f[$c+11],
                 $f[$c+12], $f[$c+13], $f[$c+14], $f[$c+15], $f[$c+16], $f[$c+17]);
 
-        if ($SNR eq 'nan' or $SNR eq '-nan') {
+        if (lc $SNR eq 'nan' or lc $SNR eq '-nan') {
             $SNR = -1;
         }
 

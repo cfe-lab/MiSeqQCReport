@@ -118,7 +118,7 @@ my $success_count = 0;
 my $failure_count = 0;
 $ENV{ORACLE_HOME} = $settings->{'env_oracle_home'};
 my $dbh=DBI->connect(
-    "dbi:Oracle:host=$settings->{'host'};sid=$settings->{'sid'};port=$settings->{'port'}", 
+    "dbi:Oracle:host=$settings->{'host'};service_name=$settings->{'sid'};port=$settings->{'port'}",
     $settings->{'user'},
     $settings->{'password'},
     {RaiseError => 1, PrintError => 0, PrintWarn => 1, AutoCommit => 0});
@@ -156,4 +156,8 @@ foreach my $path (@glob) {
 }
 
 $dbh->disconnect();
-print "Finished with $success_count successes and $failure_count failures.";
+my $summary =  "Finished with $success_count successes and $failure_count failures.";
+if ( $failure_count > 0 ) {
+    die $summary;
+}
+print $summary, "\n";
