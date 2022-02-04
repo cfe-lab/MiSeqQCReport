@@ -255,6 +255,11 @@ just want to publish a new release. Follow these steps:
     redo a release, you can create additional releases with tags vX.Y.1, vX.Y.2,
     and so on.
 3. Build the docker image, if you haven't already, then push it to docker hub.
+
+        sudo docker build . -t cfelab/miseqqc_upload:vX.Y
+        sudo docker push cfelab/miseqqc_upload:vX.Y
+        sudo docker push cfelab/miseqqc_upload
+
 4. Pull the docker image onto the server, and check that the version you expect
    is the latest. If not, you can explicitly tag it as `:latest`.
 
