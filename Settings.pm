@@ -16,7 +16,7 @@ sub new {
         # Database connection params
         host => get_env("MISEQQC_DB_HOST", "127.0.0.1"),
         port => get_env("MISEQQC_DB_PORT", "1521"),
-        sid => get_env("MISEQQC_DB_SID", "ORCL"),
+        sid => get_env("MISEQQC_DB_SID", "CFE"),
         user => get_env("MISEQQC_DB_USER", "dev_qcs"),
         password => get_env("MISEQQC_DB_PASSWORD", "dev_qcs"),
         schema => get_env("MISEQQC_DB_SCHEMA", "SPECIMEN"),

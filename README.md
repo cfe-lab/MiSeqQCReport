@@ -5,6 +5,8 @@ Settings for this project are stored in two files:
   - database-related settings are in Settings.pm
   - report-related settings are in the top of 2_generate_report.R
 
+The reports are no longer active, so the only code being used is for
+uploading QC data to the database.
 
 Changing the run start date
 ---------------------------
@@ -48,10 +50,6 @@ Developer notes
 ===============
 
 If you are not a programmer, you do not need to read this section.
-
-Active issues can be seen on [the project planning board][waffle].
-
-[waffle]: https://waffle.io/cfe-lab/miseqqcreport
 
 Database information
 --------------------
