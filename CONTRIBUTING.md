@@ -242,7 +242,9 @@ for instructions on setting up the test database.
    folder.
 
 ## Running the Software on the Server ##
-The reports are no longer run, and the uploads are run on a docker host. See the
+The reports are no longer run, and the uploads are run on a docker host (currently: 
+git-int). A systemd job starts a new container from the saved image each time the 
+upload is run. The logfile is located at `/var/log/miseqqc_upload.log`. See the 
 `install` folder for all the details.
 
 ### Releases ###
