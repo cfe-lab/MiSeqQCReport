@@ -19,7 +19,7 @@ sub getSampleSheetDate {
     if (!(-e "$path/SampleSheet.csv")) { next; }
 
     # Extract Conan's sample sheet date
-    my $command = "grep \"Project Name\" $path/SampleSheet.csv";
+    my $command = "grep -i \"Project Name\" $path/SampleSheet.csv";
     my $grep_match = `$command`;
     chomp $grep_match;
     my @fields = split(/,/,$grep_match);
